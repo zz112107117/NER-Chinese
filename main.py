@@ -4,13 +4,13 @@ import torch
 
 from data import MyDataset
 from model import BiLSTMCRF
-from train import train
-from predict import predict
+from train import train_model
+from predict import predict_model
 
 if __name__ == "__main__":
     # 特判
     if len(sys.argv) < 2:
-        print("menu:\n\ttrain\n\tpredict")
+        print("menu:\n\ttrain_model\n\tpredict_model")
         exit()
 
     # 定义训练集
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     word2id, tag2id = train_dataset.word2id, train_dataset.tag2id
     test_dataset = MyDataset(batch_size = 32, data_type = "test", word2id = word2id, tag2id = tag2id)
 
-    if sys.argv[1] == "train":
+    if sys.argv[1] == "train_model":
         # 定义模型
         model = BiLSTMCRF(tag2id = tag2id,
                           word2id_size = len(word2id),
@@ -27,12 +27,12 @@ if __name__ == "__main__":
                           embedding_dim = 100,
                           hidden_dim = 128)
         # 训练模型
-        train(train_dataset = train_dataset,
-              test_dataset = test_dataset,
-              model = model,
-              tag2id = tag2id)
+        train_model(train_dataset = train_dataset,
+                    test_dataset = test_dataset,
+                    model = model,
+                    tag2id = tag2id)
 
-    elif sys.argv[1] == "predict":
+    elif sys.argv[1] == "predict_model":
         # 定义模型
         model = BiLSTMCRF(tag2id = tag2id,
                           word2id_size = len(word2id),
@@ -43,6 +43,6 @@ if __name__ == "__main__":
         model.load_state_dict(torch.load("models/params.pkl"))
         print("model restore success!")
         # 预测
-        predict(model = model,
-                word2id= word2id,
-                tag2id = tag2id)
+        predict_model(model = model,
+                      word2id= word2id,
+                      tag2id = tag2id)

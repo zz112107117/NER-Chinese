@@ -2,7 +2,7 @@ import torch
 
 from utils import format_result, get_entity_position
 
-def predict(model, word2id, tag2id):
+def predict_model(model, word2id, tag2id):
     input_str = input("请输入文本: ")
     input_vec = [word2id.get(i, 0) for i in input_str]
     sentences = torch.tensor(input_vec).view(1, -1)

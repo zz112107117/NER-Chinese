@@ -4,7 +4,7 @@ import time
 
 from utils import f1_score
 
-def train(train_dataset, test_dataset, model, tag2id):
+def train_model(train_dataset, test_dataset, model, tag2id):
     # 定义优化器
     optimizer = optim.Adam(model.parameters())
 
