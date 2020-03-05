@@ -8,16 +8,15 @@ from model import BiLSTMCRF
 
 def train():
     # 定义训练集
-    train_dataset = MyDataset(batch_size = 20, tags = ["ORG", "PER"])
+    train_dataset = MyDataset(batch_size = 32, tags = ["ORG", "PER"])
     # 定义测试集
     word2id, tag2id = train_dataset.word2id, train_dataset.tag2id
-    test_dataset = MyDataset(batch_size = 20, data_type = "test", word2id = word2id, tag2id = tag2id)
-    test_batch = test_dataset.iteration()
+    test_dataset = MyDataset(batch_size = 32, data_type = "test", word2id = word2id, tag2id = tag2id)
 
     # 定义模型
-    model = BiLSTMCRF(tag2id = train_dataset.tag2id,
-                      word2id_size = len(train_dataset.word2id),
-                      batch_size = 20,
+    model = BiLSTMCRF(tag2id = tag2id,
+                      word2id_size = len(word2id),
+                      batch_size = 32,
                       embedding_dim = 100,
                       hidden_dim = 128)
 
@@ -49,15 +48,11 @@ def train():
             loss.backward()
             optimizer.step()
 
-        # 训练集loss
+        # 训练集loss（每个batch）
         print("epoch: {}\tloss: {:.2f}\ttime: {:.1f} sec".format(epoch + 1, total_loss / batch_count, time.time() - start))
-        # # 测试集性能
-        # print("\teval")
-        # batch_sentences, batch_tags, batch_len = zip(*test_batch.__next__())
-        # _, batch_paths = model(batch_sentences)
-        # for tag in ["ORG", "PER"]:
-        #     f1_score(batch_tags, batch_paths, tag, train_dataset.tag2id)
-
+        # 测试集性能
+        print("\t** eval **")
+        f1_score(test_dataset, model, tag2id)
 
 if __name__ == "__main__":
     train()

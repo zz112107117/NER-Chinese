@@ -89,16 +89,7 @@ class MyDataset():
                 self.batch_data.append(pad_data)
                 index += self.batch_size    # 更新索引
 
-    # 获得每个batch的数据（训练集）
+    # 获得每个batch的数据
     def get_batch(self):
         for data in self.batch_data:
             yield data
-
-    # 循环获得每个batch的数据（测试集）
-    def iteration(self):
-        index = 0
-        while True:
-            yield self.batch_data[index]
-            index += 1
-            if index == len(self.batch_data):
-                index = 0
