@@ -3,23 +3,8 @@ import torch.optim as optim
 import time
 
 from utils import f1_score
-from data import MyDataset
-from model import BiLSTMCRF
 
-def train():
-    # 定义训练集
-    train_dataset = MyDataset(batch_size = 32, tags = ["ORG", "PER"])
-    # 定义测试集
-    word2id, tag2id = train_dataset.word2id, train_dataset.tag2id
-    test_dataset = MyDataset(batch_size = 32, data_type = "test", word2id = word2id, tag2id = tag2id)
-
-    # 定义模型
-    model = BiLSTMCRF(tag2id = tag2id,
-                      word2id_size = len(word2id),
-                      batch_size = 32,
-                      embedding_dim = 100,
-                      hidden_dim = 128)
-
+def train(train_dataset, test_dataset, model, tag2id):
     # 定义优化器
     optimizer = optim.Adam(model.parameters())
 
@@ -48,11 +33,11 @@ def train():
             loss.backward()
             optimizer.step()
 
+            # 保存模型参数
+            torch.save(model.state_dict(), 'models/params.pkl')
+
         # 训练集loss（每个batch）
         print("epoch: {}\tloss: {:.2f}\ttime: {:.1f} sec".format(epoch + 1, total_loss / batch_count, time.time() - start))
         # 测试集性能
         print("\t** eval **")
         f1_score(test_dataset, model, tag2id)
-
-if __name__ == "__main__":
-    train()

@@ -1,3 +1,15 @@
+def format_result(result, text, tag):
+    entities = []
+    for i in result:
+        begin, end = i
+        entities.append({
+            "start":begin,
+            "stop":end + 1,
+            "word":text[begin:end+1],
+            "type":tag
+        })
+    return entities
+
 # 找出所有实体
 def get_entity_position(path, tag, tag2id):
     begin_tag = tag2id.get("B-" + tag)
