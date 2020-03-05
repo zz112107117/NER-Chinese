@@ -1,13 +1,13 @@
-def format_result(result, text, tag):
+# 预测时用于结果输出
+def format_result(positions, text, tag):
     entities = []
-    for i in result:
-        begin, end = i
-        entities.append({
-            "start":begin,
-            "stop":end + 1,
-            "word":text[begin:end+1],
-            "type":tag
-        })
+    for position in positions:
+        begin, end = position    # 实体的起点和终点
+        # 记录相关信息
+        entities.append({"begin": begin,
+                         "end": end,
+                         "content": text[begin: end + 1],
+                         "type": tag})
     return entities
 
 # 找出所有实体
