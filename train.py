@@ -1,5 +1,6 @@
 import torch
 import torch.optim as optim
+import time
 
 from utils import f1_score
 from data import MyDataset
@@ -9,7 +10,8 @@ def train():
     # 定义训练集
     train_dataset = MyDataset(batch_size = 20, tags = ["ORG", "PER"])
     # 定义测试集
-    test_dataset = MyDataset(batch_size = 20, data_type = "test", word2id = train_dataset.word2id, tag2id = train_dataset.tag2id)
+    word2id, tag2id = train_dataset.word2id, train_dataset.tag2id
+    test_dataset = MyDataset(batch_size = 20, data_type = "test", word2id = word2id, tag2id = tag2id)
     test_batch = test_dataset.iteration()
 
     # 定义模型
@@ -23,9 +25,11 @@ def train():
     optimizer = optim.Adam(model.parameters())
 
     for epoch in range(10):
-        index = 0
+        total_loss = 0.    # 一轮训练的loss
+        batch_count = 0.    # batch个数
+        start = time.time()    # 计时
+
         for batch in train_dataset.get_batch():
-            index += 1
             model.zero_grad()
 
             # 读取一个batch的数据并转换为tensor
@@ -37,17 +41,23 @@ def train():
             loss = model.neg_log_likelihood(batch_sentences_tensor,
                                             batch_tags_tensor,
                                             batch_len_tensor)
-            print("""epoch [{}] \tloss {:.2f}""".format(epoch, loss.tolist()[0]))
-            # 测试集性能
-            print("\teval")
-            batch_sentences, batch_tags, batch_len = zip(*test_batch.__next__())
-            _, batch_paths = model(batch_sentences)
-            for tag in ["ORG", "PER"]:
-                f1_score(batch_tags, batch_paths, tag, train_dataset.tag2id)
+
+            total_loss += loss.tolist()[0]
+            batch_count += 1
 
             # 反向传播+优化
             loss.backward()
             optimizer.step()
+
+        # 训练集loss
+        print("epoch: {}\tloss: {:.2f}\ttime: {:.1f} sec".format(epoch + 1, total_loss / batch_count, time.time() - start))
+        # # 测试集性能
+        # print("\teval")
+        # batch_sentences, batch_tags, batch_len = zip(*test_batch.__next__())
+        # _, batch_paths = model(batch_sentences)
+        # for tag in ["ORG", "PER"]:
+        #     f1_score(batch_tags, batch_paths, tag, train_dataset.tag2id)
+
 
 if __name__ == "__main__":
     train()

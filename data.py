@@ -1,11 +1,9 @@
 import copy
 
 class MyDataset():
-    def __init__(self, max_length = 100, batch_size = 20, data_type = "train", tags = ["ORG", "PER"], word2id = None, tag2id = None):
-        self.index = 0
+    def __init__(self, batch_size = 20, data_type = "train", tags = ["ORG", "PER"], word2id = None, tag2id = None):
         self.input_size = 0
 
-        self.max_length = max_length
         self.batch_size = batch_size
         self.data_type = data_type
 
